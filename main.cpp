@@ -1,121 +1,44 @@
-//dev branch
-
 #include <iostream>
 #include <string>
-
-//collections
 #include <map>
-#include <vector>
-
 
 using namespace std;
 
-enum Category
-{
-    BOOK,
-    MOVIE,
-    MUSIC
-};
-
-class CategoryService
-{
-private:
-    //Static Flow
-    static uint64_t _id;
-
-    //Basic
-    map<Category, map<int, string>> _categories;
-public:
-    CategoryService() = default;
-    CategoryService(Category category, string category_name)
-    {
-        setCategory(category, category_name);
-    }
-    string getCategoryName(Category category)
-    {
-        return _categories[category].begin()->second;
-    }
-    int getCategoryValue(Category category)
-    {
-        return _categories[category].begin()->first;
-    }
-    void setCategory(Category category, string category_name)
-    {
-        pair<int, string> category_pair = make_pair(_id++, category_name);
-        _categories[category].insert(category_pair);
-    }
-};
-
-uint64_t CategoryService::_id = 0;
-
-
-class Item abstract
-{
-protected:
-    string _name;
-public:
-    virtual void print() = 0;
-};
-
-class Book : public Item
-{
-public:
-    Book(string name)
-    {
-        _name = name;
-    }
-    void print() override
-    {
-        cout << "The Book: \"" << _name << "\"" << endl;
-    }
-};
-
-class Movie : public Item
-{
-public:
-    Movie(string name)
-    {
-        _name = name;
-    }
-    void print() override
-    {
-        cout << "The Movie: \"" << _name << "\"" << endl;
-    }
-};
-
-class Music : public Item
-{
-public:
-    Music(string name)
-    {
-        _name = name;
-    }
-    void print() override
-    {
-        cout << "The Music: \"" << _name << "\"" << endl;
-    }
-};
-
-int main()
-{
-    CategoryService categoryService;
-    map<Category, vector<Item*>> collection;
-
-    categoryService.setCategory(BOOK, "Book");
-    categoryService.setCategory(MOVIE, "Movie");
-    categoryService.setCategory(MUSIC, "Music");
-
-    collection[BOOK].push_back(new Book("The Lord of the Rings"));
-    collection[MOVIE].push_back(new Movie("The Lord of the Rings"));
-    collection[MUSIC].push_back(new Music("The Lord of the Rings"));
-
-    for (auto& category : collection)
-    {
-        cout << "Category: " << categoryService.getCategoryName(category.first) << endl;
-        for (auto& item : category.second)
-        {
-            item->print();
+// Function to count word frequencies
+void countWordFrequencies(const string& text, map<string, int>& wordCount) {
+    string word;
+	for (char ch : text) {// Loop through each character in the text
+        if (isspace(ch) || ch == ',' || ch == '.' || ch == '!' || ch == '?') {
+            if (!word.empty()) {
+                ++wordCount[word];
+				word.clear();// Clear the word
+            }
+        }
+        else {
+            word += ch;
         }
     }
+    if (!word.empty()) {
+        ++wordCount[word];
+    }
+}
+
+// Function to print word frequencies
+void printWordFrequencies(const map<string, int>& wordCount) {
+    for (const auto& entry : wordCount) {
+        cout << entry.first << " - " << entry.second << endl;
+    }
+}
+
+int main() {
+    string text = "This is a test text. This text is for testing purposes! Is this text working correctly? Yes, it is.";
+    cout << "Test text: \n" << text << endl;
+
+    map<string, int> wordCount;
+    countWordFrequencies(text, wordCount);
+
+    cout << "\nWord frequencies:\n";
+    printWordFrequencies(wordCount);
+
     return 0;
 }
