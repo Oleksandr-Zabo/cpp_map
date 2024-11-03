@@ -1,121 +1,109 @@
-//dev branch
-
 #include <iostream>
 #include <string>
-
-//collections
 #include <map>
 #include <vector>
 
-
 using namespace std;
 
-enum Category
-{
-    BOOK,
-    MOVIE,
-    MUSIC
-};
+// Function to add a new book
+void addBook(map<string, vector<string>>& library) {
+    string title;
+    cin.ignore();
+    cout << "Enter book title: ";
+    getline(cin, title);
 
-class CategoryService
-{
-private:
-    //Static Flow
-    static uint64_t _id;
+    vector<string> authors;
+    string author;
+    cin.ignore();
+    cout << "Enter authors (separated by commas): ";
+    getline(cin, author);
+    cin.ignore();
 
-    //Basic
-    map<Category, map<int, string>> _categories;
-public:
-    CategoryService() = default;
-    CategoryService(Category category, string category_name)
-    {
-        setCategory(category, category_name);
+    size_t pos = 0;
+    while ((pos = author.find(',')) != string::npos) {
+		authors.push_back(author.substr(0, pos));// .substr() returns a substring of the string
+		author.erase(0, pos + 1);//.erase() removes characters from the string
     }
-    string getCategoryName(Category category)
-    {
-        return _categories[category].begin()->second;
-    }
-    int getCategoryValue(Category category)
-    {
-        return _categories[category].begin()->first;
-    }
-    void setCategory(Category category, string category_name)
-    {
-        pair<int, string> category_pair = make_pair(_id++, category_name);
-        _categories[category].insert(category_pair);
-    }
-};
+    authors.push_back(author);
 
-uint64_t CategoryService::_id = 0;
+    library[title] = authors;
+}
 
+// Function to find authors by book title
+void findAuthors(const map<string, vector<string>>& library) {
+    string title;
+    cin.ignore();
+    cout << "Enter book title to search for authors: ";
+    getline(cin, title);
+    cin.ignore();
 
-class Item abstract
-{
-protected:
-    string _name;
-public:
-    virtual void print() = 0;
-};
-
-class Book : public Item
-{
-public:
-    Book(string name)
-    {
-        _name = name;
-    }
-    void print() override
-    {
-        cout << "The Book: \"" << _name << "\"" << endl;
-    }
-};
-
-class Movie : public Item
-{
-public:
-    Movie(string name)
-    {
-        _name = name;
-    }
-    void print() override
-    {
-        cout << "The Movie: \"" << _name << "\"" << endl;
-    }
-};
-
-class Music : public Item
-{
-public:
-    Music(string name)
-    {
-        _name = name;
-    }
-    void print() override
-    {
-        cout << "The Music: \"" << _name << "\"" << endl;
-    }
-};
-
-int main()
-{
-    CategoryService categoryService;
-    map<Category, vector<Item*>> collection;
-
-    categoryService.setCategory(BOOK, "Book");
-    categoryService.setCategory(MOVIE, "Movie");
-    categoryService.setCategory(MUSIC, "Music");
-
-    collection[BOOK].push_back(new Book("The Lord of the Rings"));
-    collection[MOVIE].push_back(new Movie("The Lord of the Rings"));
-    collection[MUSIC].push_back(new Music("The Lord of the Rings"));
-
-    for (auto& category : collection)
-    {
-        cout << "Category: " << categoryService.getCategoryName(category.first) << endl;
-        for (auto& item : category.second)
-        {
-            item->print();
+    auto it = library.find(title);
+    if (it != library.end()) {
+        cout << "Authors of \"" << title << "\": ";
+        for (const string& author : it->second) {
+            cout << author << " ";
         }
+        cout << endl;
     }
+    else {
+        cout << "Book not found." << endl;
+    }
+}
+
+// Function to print all books and their authors
+void printLibrary(const map<string, vector<string>>& library) {
+    cout << "\nLibrary contents:\n";
+    for (const auto& entry : library) {
+        cout << entry.first << " - ";
+        for (const string& author : entry.second) {
+            cout << author << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    map<string, vector<string>> library = 
+    {
+        {"Adventures of Sherlock Holmes", {"Arthur Conan Doyle"}},
+
+        {"Pride and Prejudice", {"Jane Austen"}},
+
+        {"1984", {"George Orwell"}}
+    };
+
+    int choice;
+
+    do {
+		system("cls");
+        cout << "Library Management System\n";
+        cout << "1. Add a new book\n";
+        cout << "2. Find authors by book title\n";
+        cout << "3. Print all books and their authors\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            addBook(library);
+            break;
+        case 2:
+            findAuthors(library);
+            break;
+        case 3:
+            printLibrary(library);
+            break;
+        case 4:
+            cout << "Exiting the program.\n";
+			exit(0);
+            break;
+        default:
+            cout << "Invalid choice. Please try again.\n";
+        }
+		
+		system("pause");
+    } while (choice != 4);
+
     return 0;
 }
